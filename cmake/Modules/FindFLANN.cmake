@@ -36,16 +36,19 @@
 
 # Early return if FLANN target is already defined. This makes it safe to run
 # this script multiple times.
+message("--------------------flann cmake ${CMAKE_CURRENT_LIST_LINE}----------------------------------")
+
 if(TARGET FLANN::FLANN)
   return()
 endif()
 
 # First try to locate FLANN using modern config
-find_package(flann NO_MODULE ${FLANN_FIND_VERSION} QUIET)
-
+find_package(flann NO_MODULE ${FLANN_FIND_VERSION})
+message("--------------------if(flann_FOUND)${CMAKE_CURRENT_LIST_LINE}----------------------------------")
 if(flann_FOUND)
   unset(flann_FOUND)
   set(FLANN_FOUND ON)
+  message("--------------------set(FLANN_FOUND ON)${CMAKE_CURRENT_LIST_LINE}----------------------------------")
 
   # Create interface library that effectively becomes an alias for the appropriate (static/dynamic) imported FLANN target
   add_library(FLANN::FLANN INTERFACE IMPORTED)
@@ -78,18 +81,25 @@ if(flann_FOUND)
   get_filename_component(_config_dir "${flann_CONFIG}" DIRECTORY)
   get_filename_component(FLANN_ROOT "${_config_dir}/../../.." ABSOLUTE)
   unset(_config_dir)
-  message(STATUS "Found flann version ${flann_VERSION}")
+  message(STATUS "!!!------Found flann version ${flann_VERSION} ${CMAKE_CURRENT_LIST_LINE}")
   return()
 endif()
-
+message(STATUS "!!!------ Second try to locate FLANN using pkgconfig ${CMAKE_CURRENT_LIST_LINE}")
 # Second try to locate FLANN using pkgconfig
 find_package(PkgConfig QUIET)
+message(STATUS "!!!------ if(FLANN_FIND_VERSION): ${FLANN_FIND_VERSION} ${CMAKE_CURRENT_LIST_LINE}")
 if(FLANN_FIND_VERSION)
+  message(STATUS "!!!------pkg_check_modules(PC_FLANN flann>=${FLANN_FIND_VERSION}) ${CMAKE_CURRENT_LIST_LINE}")
   pkg_check_modules(PC_FLANN flann>=${FLANN_FIND_VERSION})
+  #pkg_check_modules(PC_FLANN flann>=${FLANN_FIND_VERSION} NO_CMAKE_PATH /home/tzq/disk2/pc_share/yh-orin/lib/3rdparty/flann1.9.1/lib//home/tzq/disk2/pc_share/yh-orin/lib/3rdparty/flann1.9.1/lib/pkgconfig)
+  message(STATUS "!!!------flann: ${flann} ${CMAKE_CURRENT_LIST_LINE}")
 else()
+  message(STATUS "!!!------pkg_check_modules(PC_FLANN flann) ${CMAKE_CURRENT_LIST_LINE}")
   pkg_check_modules(PC_FLANN flann)
 endif()
 
+
+message(STATUS "!!!------ find_path(FLANN_INCLUDE_DIR")
 find_path(FLANN_INCLUDE_DIR
   NAMES
     flann/flann.hpp
@@ -131,7 +141,7 @@ find_library(FLANN_LIBRARY_DEBUG_SHARED
   PATH_SUFFIXES
     lib
 )
-
+message(STATUS "!!!------ find_library(FLANN_LIBRARY_STATIC")
 find_library(FLANN_LIBRARY_STATIC
   NAMES
     flann_cpp_s
@@ -159,7 +169,7 @@ find_library(FLANN_LIBRARY_DEBUG_STATIC
   PATH_SUFFIXES
     lib
 )
-
+message(STATUS "!!!------ if(FLANN_LIBRARY_SHARED AND FLANN_LIBRARY_STATI")
 if(FLANN_LIBRARY_SHARED AND FLANN_LIBRARY_STATIC)
   if(PCL_FLANN_REQUIRED_TYPE MATCHES "SHARED")
     set(FLANN_LIBRARY_TYPE SHARED)
@@ -183,7 +193,7 @@ elseif(FLANN_LIBRARY_SHARED)
   set(FLANN_LIBRARY_TYPE SHARED)
   set(FLANN_LIBRARY ${FLANN_LIBRARY_SHARED})
 endif()
-
+message(STATUS "!!!------ include(FindPackageHandleStandardArgs)")
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
   FLANN DEFAULT_MSG
@@ -220,3 +230,5 @@ if(FLANN_FOUND)
   get_filename_component(FLANN_ROOT "${FLANN_INCLUDE_DIR}" PATH)
   message(STATUS "FLANN found (include: ${FLANN_INCLUDE_DIR}, lib: ${FLANN_LIBRARY})")
 endif()
+
+message("--------------------done flann cmake----------------------------------")

@@ -1,11 +1,47 @@
 ### ---[ PCL global CMake
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 
 if(POLICY CMP0074)
   # 1. Remove with 3.12.4.
   # 2. Remove search paths with *_ROOT since they will be automatically checked
   cmake_policy(SET CMP0074 NEW)
 endif()
+
+set(ORIN 1)
+set(BUILD_TARGET "orin")
+
+set(flann_DIR /home/tzq/disk2/pc_share/yh-orin/lib/3rdparty/flann1.9.1)
+#设置平台公共参数选项
+set(CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS} -Wall -Wno-maybe-uninitialized -Wno-unknown-pragmas -Wno-deprecated-declarations"
+)# 注意 -march=native 在不同机器有可能要做不同取舍
+
+set(PATH_OF_TOOLCHAINS /home/tzq/disk2/pc_share/yh-orin/toolchains/aarch64--glibc--stable-2020.08-1/bin)
+
+if(${BUILD_TARGET} MATCHES orin)
+  message("+++compile in orin")
+  #add_definitions(-D_EMBEDDED_ARM64_)
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -O3 -Wno-dev" )
+  set(CMAKE_C_COMPILER ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-gcc)
+  set(CMAKE_CXX_COMPILER  ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-g++)
+endif()
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -D_LARGE_FILE")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -std=gnu++11 -Wall -D_LARGE_FILE")
+set(THIRD_LIBS
+    -pthread 
+    )
+
+SET(CUDA_TOOLKIT_ROOT_DIR /home/tzq/disk2/pc_share/cuda-11.4)
+SET(CUDA_SEPARABLE_COMPILATION ON)
+#find_package(CUDA 11.4 REQUIRED)
+message("++++++++CUDA_INCLUDE_DIRS" ${CUDA_INCLUDE_DIRS})
+message("++++++++GLOB CUDA_LIBRARIES" ${CUDA_LIBRARIES})    
+set(CUDA_INCLUDE_DIRS /home/tzq/disk2/pc_share/cuda-11.4/targets/aarch64-linux/include)
+include_directories(${CUDA_INCLUDE_DIRS})
+set(CUDA_LIBRARIES_PATH /home/tzq/disk2/pc_share/cuda-11.4/targets/aarch64-linux/lib)
+file(GLOB CUDA_LIBRARIES "${CUDA_LIBRARIES_PATH}/*.so")  
+set(CUDA_NVCC_FLAGS -arch=sm_87; -rdc=true; -lcudadevrt -lcudart -lcublas)
 
 # Set target C++ standard and required compiler features
 set(CMAKE_CXX_STANDARD 14 CACHE STRING "The target C++ standard. PCL requires C++14 or higher.")
@@ -319,7 +355,9 @@ find_package(Eigen 3.1 REQUIRED)
 include_directories(SYSTEM ${EIGEN_INCLUDE_DIRS})
 
 # FLANN (required)
+message("----------------------flann 1----------------")
 find_package(FLANN 1.9.1 REQUIRED)
+message("----------------------flann 2----------------")
 if(NOT (${FLANN_LIBRARY_TYPE} MATCHES ${PCL_FLANN_REQUIRED_TYPE}) AND NOT (${PCL_FLANN_REQUIRED_TYPE} MATCHES "DONTCARE"))
   message(FATAL_ERROR "Flann was selected with ${PCL_FLANN_REQUIRED_TYPE} but found as ${FLANN_LIBRARY_TYPE}")
 endif()
