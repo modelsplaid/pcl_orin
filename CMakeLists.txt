@@ -37,6 +37,7 @@ SET(CUDA_SEPARABLE_COMPILATION ON)
 #find_package(CUDA 11.4 REQUIRED)
 message("++++++++CUDA_INCLUDE_DIRS" ${CUDA_INCLUDE_DIRS})
 message("++++++++GLOB CUDA_LIBRARIES" ${CUDA_LIBRARIES})    
+#include_directories(/home/tzq/disk2/pc_share/cuda-11.4/targets/aarch64-linux/include/crt)
 set(CUDA_INCLUDE_DIRS /home/tzq/disk2/pc_share/cuda-11.4/targets/aarch64-linux/include)
 include_directories(${CUDA_INCLUDE_DIRS})
 set(CUDA_LIBRARIES_PATH /home/tzq/disk2/pc_share/cuda-11.4/targets/aarch64-linux/lib)
@@ -412,7 +413,9 @@ endif()
 # Cuda
 option(WITH_CUDA "Build NVIDIA-CUDA support" TRUE)
 if(WITH_CUDA)
+message("------Go to pcl_find_cuda.cmake ")
   include("${PCL_SOURCE_DIR}/cmake/pcl_find_cuda.cmake")
+  message("------Done to pcl_find_cuda.cmake ")
 endif()
 
 
