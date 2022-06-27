@@ -23,11 +23,16 @@ if(CUDA_FOUND)
         string(REPLACE "\n" ";" __CUDA_ARCH_BIN ${OUTPUT_VAL})
         #Remove last empty entry
         list(REMOVE_AT __CUDA_ARCH_BIN -1)
-      else()
+        list(REMOVE_AT __CUDA_ARCH_BIN 0 1 2 3 4 )
+        message(STATUS "++++++ REMOVE_AT: ${__CUDA_ARCH_BIN}")
+
+        else()
         message(FATAL_ERROR "Failed to run NVCC to get list of GPU codes: ${EXIT_CODE}")
       endif()
     elseif(${CUDA_VERSION_STRING} VERSION_GREATER_EQUAL "11.0")
       set(__CUDA_ARCH_BIN "52;53;60;61;62;70;72;75;80")
+      message(STATUS "++++++11.0 __CUDA_ARCH_BIN: ${__CUDA_ARCH_BIN}")
+
     elseif(${CUDA_VERSION_STRING} VERSION_GREATER_EQUAL "10.0")
       set(__CUDA_ARCH_BIN "52;53;60;61;62;70;72;75")
     elseif(${CUDA_VERSION_STRING} VERSION_GREATER_EQUAL "9.1")
@@ -40,6 +45,9 @@ if(CUDA_FOUND)
   endif()
 
   set(CUDA_ARCH_BIN ${__CUDA_ARCH_BIN} CACHE STRING "Specify 'real' GPU architectures to build binaries for")
+  set(CUDA_ARCH_BIN ${__CUDA_ARCH_BIN})
+
+  message(STATUS "CUDA_ARCH_BIN: ${CUDA_ARCH_BIN}")
   
   if(POLICY CMP0104)
     cmake_policy(SET CMP0104 NEW)

@@ -465,6 +465,7 @@ set(PCL_MODULES_NAMES_UNSORTED ${PCL_MODULES_NAMES})
 topological_sort(PCL_MODULES_NAMES PCL_ _DEPENDS)
 sort_relative(PCL_MODULES_NAMES_UNSORTED PCL_MODULES_NAMES PCL_MODULES_DIRS)
 foreach(subdir ${PCL_MODULES_DIRS})
+  message("+++ ${PCL_SOURCE_DIR}/${subdir}")
   add_subdirectory("${PCL_SOURCE_DIR}/${subdir}")
 endforeach()
 
