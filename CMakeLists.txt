@@ -1,5 +1,7 @@
 ### ---[ PCL global CMake
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
+set(CMAKE_C_COMPILER ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-gcc)
+set(CMAKE_CXX_COMPILER  ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-g++)
 
 if(POLICY CMP0074)
   # 1. Remove with 3.12.4.
@@ -10,14 +12,15 @@ endif()
 set(ORIN 1)
 set(BUILD_TARGET "orin")
 
-set(flann_DIR /home/tzq/disk2/pc_share/yh-orin/lib/3rdparty/flann1.9.1)
+set(FLANN_INCLUDE_DIR /home/tzq/disk2/pc_share/yh-orin/lib/3rdparty/flann1.9.1/lib/pkgconfig)
 #设置平台公共参数选项
 set(CMAKE_CXX_FLAGS
     "${CMAKE_CXX_FLAGS} -Wall -Wno-maybe-uninitialized -Wno-unknown-pragmas -Wno-deprecated-declarations"
 )# 注意 -march=native 在不同机器有可能要做不同取舍
 
 set(PATH_OF_TOOLCHAINS /home/tzq/disk2/pc_share/yh-orin/toolchains/aarch64--glibc--stable-2020.08-1/bin)
-
+###########################################################################3
+############################################################################
 if(${BUILD_TARGET} MATCHES orin)
   message("+++compile in orin")
   #add_definitions(-D_EMBEDDED_ARM64_)
@@ -26,11 +29,19 @@ if(${BUILD_TARGET} MATCHES orin)
   set(CMAKE_CXX_COMPILER  ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-g++)
 endif()
 
+add_definitions(-D_EMBEDDED_ARM64_)
+set(CMAKE_C_COMPILER ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-gcc)
+set(CMAKE_CXX_COMPILER  ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-g++)
+
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -D_LARGE_FILE")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -std=gnu++11 -Wall -D_LARGE_FILE")
 set(THIRD_LIBS
     -pthread 
     )
+
+include_directories(/home/tzq/disk2/pc_share/yh-orin/lib/3rdparty/flann1.9.1/include)
+include_directories(/home/tzq/disk2/pc_share/yh-orin/lib/3rdparty/boost1.71.0/include)
 
 SET(CUDA_TOOLKIT_ROOT_DIR /home/tzq/disk2/pc_share/cuda-11.4)
 SET(CUDA_SEPARABLE_COMPILATION ON)
@@ -52,6 +63,9 @@ set(PCL_CXX_COMPILE_FEATURES cxx_std_14)
 
 set(CMAKE_CUDA_STANDARD 14 CACHE STRING "The target CUDA/C++ standard. PCL requires CUDA/C++ 14 or higher.")
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+
+##############################################
+###############################################
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "possible configurations" FORCE)
 
@@ -464,6 +478,14 @@ collect_subproject_directory_names("${PCL_SOURCE_DIR}" "CMakeLists.txt" PCL_MODU
 set(PCL_MODULES_NAMES_UNSORTED ${PCL_MODULES_NAMES})
 topological_sort(PCL_MODULES_NAMES PCL_ _DEPENDS)
 sort_relative(PCL_MODULES_NAMES_UNSORTED PCL_MODULES_NAMES PCL_MODULES_DIRS)
+
+
+add_definitions(-D_EMBEDDED_ARM64_)
+set(CMAKE_C_COMPILER ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-gcc)
+set(CMAKE_CXX_COMPILER  ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-g++)
+
+
+
 foreach(subdir ${PCL_MODULES_DIRS})
   message("+++ ${PCL_SOURCE_DIR}/${subdir}")
   add_subdirectory("${PCL_SOURCE_DIR}/${subdir}")
