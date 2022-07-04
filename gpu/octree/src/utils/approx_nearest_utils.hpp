@@ -39,7 +39,8 @@ nearestVoxel(const float3 query,
 {
   assert(mask != 0);
   // identify closest voxel
-  float closest_distance = std::numeric_limits<float>::max();
+  //float closest_distance = std::numeric_limits<float>::max();
+  float closest_distance = 999999999;
   unsigned closest_index = 0;
   uint3 closest = make_uint3(0, 0, 0);
 

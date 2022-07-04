@@ -12,6 +12,7 @@ mark_as_advanced("BUILD_${SUBSYS_NAME}")
 if(NOT build)
   return()
 endif()
+return()
 
 file(GLOB incs include/pcl/gpu/kinfu_large_scale/*.h*)
 file(GLOB impl_incs include/pcl/gpu/kinfu_large_scale/impl/*.h*)

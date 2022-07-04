@@ -70,3 +70,5 @@ if(CUDA_FOUND)
     
   endif ()
 endif()
+
+message("!!!!!!!!!!!!!!!CUDAHOSTCXX:"  $ENV{CUDAHOSTCXX})
