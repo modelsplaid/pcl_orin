@@ -160,8 +160,8 @@ private:
 
   {
     int index = 0;
-    float dist_squared = std::numeric_limits<float>::max();
-
+    //float dist_squared = std::numeric_limits<float>::max();
+    float dist_squared = 999999999;
     // serial step
     for (int idx = Warp::laneId(); idx < length; idx += Warp::STRIDE) {
       const float dx = batch.points[beg + idx] - active_query.x;

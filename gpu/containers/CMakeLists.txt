@@ -29,6 +29,7 @@ PCL_CUDA_ADD_LIBRARY(${LIB_NAME} COMPONENT ${SUBSYS_NAME} SOURCES ${srcs} ${incs
 #Ensures that CUDA is added and the project can compile as it uses cuda calls.
 # tzq commented
 #set_source_files_properties(src/device_memory.cpp PROPERTIES LANGUAGE CUDA)
+set_source_files_properties(src/device_memory.cpp PROPERTIES CUDA_ARCHITECTURES "35;50;72;87")
 # tzq commented
 set(EXT_DEPS "")
 #set(EXT_DEPS CUDA)

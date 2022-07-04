@@ -264,6 +264,7 @@ endfunction()
 # COMPONENT The part of PCL that this library belongs to.
 # SOURCES The source files for the library.
 function(PCL_CUDA_ADD_LIBRARY _name)
+  set(CUDA_NVCC_FLAGS -arch=sm_87; -rdc=true; -lcudadevrt -lcudart -lcublas --expt-relaxed-constexpr)
   set(options)
   set(oneValueArgs COMPONENT)
   set(multiValueArgs SOURCES)
@@ -271,19 +272,26 @@ function(PCL_CUDA_ADD_LIBRARY _name)
 
   REMOVE_VTK_DEFINITIONS()
 
-  add_library(${_name} ${PCL_LIB_TYPE} ${ADD_LIBRARY_OPTION_SOURCES})
+  message("aaaaaaaaa in cuda_add_library(${_name} ${PCL_LIB_TYPE} ${ADD_LIBRARY_OPTION_SOURCES})")
+  cuda_add_library(${_name} ${PCL_LIB_TYPE} ${ADD_LIBRARY_OPTION_SOURCES})
+  message("bbbbbbbbb in cuda_add_library(${_name} ${PCL_LIB_TYPE} ${ADD_LIBRARY_OPTION_SOURCES})")
 
   PCL_ADD_VERSION_INFO(${_name})
 
+  message("ccccccccc in ${GEN_CODE} target_compile_options(${_name} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: ${GEN_CODE} --expt-relaxed-constexpr>)")
   target_compile_options(${_name} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: ${GEN_CODE} --expt-relaxed-constexpr>)
 
   target_include_directories(${_name} PRIVATE ${CUDA_TOOLKIT_INCLUDE})
-
+  message("+++++++++++CUDA_TOOLKIT_INCLUDE: ${CUDA_TOOLKIT_INCLUDE}++++++++++++")
+  message("+++++++++++PCL_LIB_TYPE: ${PCL_LIB_TYPE}++++++++++++")
+  message("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   set_target_properties(${_name} PROPERTIES
     VERSION ${PCL_VERSION}
     SOVERSION ${PCL_VERSION_MAJOR}.${PCL_VERSION_MINOR}
     DEFINE_SYMBOL "PCLAPI_EXPORTS")
   set_target_properties(${_name} PROPERTIES FOLDER "Libraries")
+  set_target_properties(${_name} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  
 
   install(TARGETS ${_name}
           RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT pcl_${ADD_LIBRARY_OPTION_COMPONENT}

@@ -33,8 +33,8 @@ set(CMAKE_C_COMPILER ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER  ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-g++)
 
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -D_LARGE_FILE")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -std=gnu++11 -Wall -D_LARGE_FILE")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -D_LARGE_FILE -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -std=gnu++14 -Wall -D_LARGE_FILE -fPIC")
 set(THIRD_LIBS
     -pthread 
     )
@@ -51,8 +51,8 @@ set(CUDA_INCLUDE_DIRS /home/tzq/disk2/pc_share/cuda-11.4/targets/aarch64-linux/i
 include_directories(${CUDA_INCLUDE_DIRS})
 set(CUDA_LIBRARIES_PATH /home/tzq/disk2/pc_share/cuda-11.4/targets/aarch64-linux/lib)
 file(GLOB CUDA_LIBRARIES "${CUDA_LIBRARIES_PATH}/*.so")  
-set(CUDA_NVCC_FLAGS -arch=sm_87; -rdc=true; -lcudadevrt -lcudart -lcublas)
-
+#set(CUDA_NVCC_FLAGS -arch=sm_87; -rdc=true; -lcudadevrt -lcudart -lcublas -shared -rdc=true)
+set(CUDA_NVCC_FLAGS  -rdc=true; -lcudadevrt -lcudart -lcublas -shared -rdc=true)
 # Set target C++ standard and required compiler features
 set(CMAKE_CXX_STANDARD 14 CACHE STRING "The target C++ standard. PCL requires C++14 or higher.")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -61,7 +61,7 @@ set(PCL_CXX_COMPILE_FEATURES cxx_std_14)
 
 set(CMAKE_CUDA_STANDARD 14 CACHE STRING "The target CUDA/C++ standard. PCL requires CUDA/C++ 14 or higher.")
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-
+#set(PCL_LIB_TYPE "STATIC")
 ##############################################
 ###############################################
 

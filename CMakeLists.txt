@@ -1,8 +1,13 @@
 ### ---[ PCL global CMake
-cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+project(PCL VERSION 1.12.1.99)
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+
 set(CMAKE_C_COMPILER ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER  ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-g++)
-
+SET(CUDA_TOOLKIT_ROOT_DIR /home/tzq/disk2/pc_share/cuda-11.4)
+message("++++++++find_package(CUDA 11.4 REQUIRED)")
+find_package(CUDA 11.4 REQUIRED)
 if(POLICY CMP0074)
   # 1. Remove with 3.12.4.
   # 2. Remove search paths with *_ROOT since they will be automatically checked
@@ -11,7 +16,7 @@ endif()
 
 set(ORIN 1)
 set(BUILD_TARGET "orin")
-
+#include($ENV{ORIN_CFG_PATH}/yh_project_config.cmake)
 set(FLANN_INCLUDE_DIR /home/tzq/disk2/pc_share/yh-orin/lib/3rdparty/flann1.9.1/lib/pkgconfig)
 #设置平台公共参数选项
 set(CMAKE_CXX_FLAGS
@@ -21,6 +26,7 @@ set(CMAKE_CXX_FLAGS
 set(PATH_OF_TOOLCHAINS /home/tzq/disk2/pc_share/yh-orin/toolchains/aarch64--glibc--stable-2020.08-1/bin)
 ###########################################################################3
 ############################################################################
+message("!!!!!!!!!!!!!!!CUDAHOSTCXX:"  $ENV{CUDAHOSTCXX})
 if(${BUILD_TARGET} MATCHES orin)
   message("+++compile in orin")
   #add_definitions(-D_EMBEDDED_ARM64_)
@@ -34,8 +40,8 @@ set(CMAKE_C_COMPILER ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER  ${PATH_OF_TOOLCHAINS}/aarch64-buildroot-linux-gnu-g++)
 
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -D_LARGE_FILE")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -std=gnu++11 -Wall -D_LARGE_FILE")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -D_LARGE_FILE -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -std=gnu++14 -Wall -D_LARGE_FILE -fPIC")
 set(THIRD_LIBS
     -pthread 
     )
@@ -45,7 +51,8 @@ include_directories(/home/tzq/disk2/pc_share/yh-orin/lib/3rdparty/boost1.71.0/in
 
 SET(CUDA_TOOLKIT_ROOT_DIR /home/tzq/disk2/pc_share/cuda-11.4)
 SET(CUDA_SEPARABLE_COMPILATION ON)
-#find_package(CUDA 11.4 REQUIRED)
+message("++++++++find_package(CUDA 11.4 REQUIRED)")
+find_package(CUDA 11.4 REQUIRED)
 message("++++++++CUDA_INCLUDE_DIRS" ${CUDA_INCLUDE_DIRS})
 message("++++++++GLOB CUDA_LIBRARIES" ${CUDA_LIBRARIES})    
 #include_directories(/home/tzq/disk2/pc_share/cuda-11.4/targets/aarch64-linux/include/crt)
@@ -53,7 +60,7 @@ set(CUDA_INCLUDE_DIRS /home/tzq/disk2/pc_share/cuda-11.4/targets/aarch64-linux/i
 include_directories(${CUDA_INCLUDE_DIRS})
 set(CUDA_LIBRARIES_PATH /home/tzq/disk2/pc_share/cuda-11.4/targets/aarch64-linux/lib)
 file(GLOB CUDA_LIBRARIES "${CUDA_LIBRARIES_PATH}/*.so")  
-set(CUDA_NVCC_FLAGS -arch=sm_87; -rdc=true; -lcudadevrt -lcudart -lcublas)
+set(CUDA_NVCC_FLAGS -arch=sm_87; -rdc=true; -lcudadevrt -lcudart -lcublas --expt-relaxed-constexpr)
 
 # Set target C++ standard and required compiler features
 set(CMAKE_CXX_STANDARD 14 CACHE STRING "The target C++ standard. PCL requires C++14 or higher.")
@@ -63,7 +70,9 @@ set(PCL_CXX_COMPILE_FEATURES cxx_std_14)
 
 set(CMAKE_CUDA_STANDARD 14 CACHE STRING "The target CUDA/C++ standard. PCL requires CUDA/C++ 14 or higher.")
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-
+set(CUDA_SDK_ROOT_DIR /home/tzq/disk2/pc_share/cuda-11.4)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+add_compile_options(-fPIC)
 ##############################################
 ###############################################
 
@@ -74,8 +83,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "build type default to RelWithDebInfo, set to Release to improve performance" FORCE)
 endif()
 
-project(PCL VERSION 1.12.1.99)
-string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+
 
 ### ---[ Find universal dependencies
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
@@ -432,6 +440,7 @@ message("------Go to pcl_find_cuda.cmake ")
   message("------Done to pcl_find_cuda.cmake ")
 endif()
 
+add_compile_options(-fPIC)
 
 # Reset VTK_FOUND to off
 set(VTK_FOUND OFF)
